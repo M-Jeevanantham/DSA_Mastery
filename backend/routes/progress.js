@@ -35,7 +35,7 @@ router.put('/', auth, async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { $set: updateFields },
-      { new: true }
+      { returnDocument: 'after' }
     ).select('-password');
 
     res.json(user);

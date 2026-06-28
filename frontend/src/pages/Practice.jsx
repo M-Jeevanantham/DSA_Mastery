@@ -32,92 +32,195 @@ export const Practice = () => {
   };
 
   return (
-    <div className="page on">
-      <div className="hero">
-        <h1>Practice Problems</h1>
-        <p>Curated list of high-yield problems. Write and save your personal code solutions directly to your database.</p>
+    <div className="page on" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+      
+      <div style={{ 
+        padding: '0 0 1.5rem 0',
+        marginBottom: '2rem',
+        borderBottom: '1px solid var(--border)',
+        display: 'flex', 
+        justifyContent: 'space-between', 
+        alignItems: 'center'
+      }}>
+        <div>
+          <h1 style={{ 
+            fontSize: '2.5rem', 
+            margin: '0 0 0.5rem 0',
+            background: 'linear-gradient(to right, #fff, #a1a1aa)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '-1px'
+          }}>
+            Practice Arena
+          </h1>
+          <p style={{ margin: 0, color: 'var(--text-muted)', fontSize: '1.1rem' }}>
+            Curated, high-yield problems. Write notes and track your progress.
+          </p>
+        </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '1rem', overflowX: 'auto', paddingBottom: '1rem', marginBottom: '2rem' }}>
-        {Object.keys(PROBS).map(tab => (
-          <button 
-            key={tab} 
-            className={`btn ${activeTab === tab ? 'primary' : ''}`}
-            style={{ textTransform: 'capitalize' }}
-            onClick={() => setActiveTab(tab)}
-          >
-            {tab}
-          </button>
-        ))}
-      </div>
-
-      <div className="prob-wrap">
-        {PROBS[activeTab]?.map((prob) => (
-          <div key={prob.id} className="card p-card" style={{ marginBottom: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <h3 style={{ margin: '0 0 0.5rem 0' }}>{prob.name}</h3>
-              <span className={`diff-badge ${prob.diff.toLowerCase()}`} style={{ fontSize: '0.8rem', padding: '0.2rem 0.6rem', borderRadius: '4px', background: 'var(--sub)', color: 'var(--bg)' }}>
-                {prob.diff}
-              </span>
-            </div>
-            
-            <p style={{ color: 'var(--sub)', marginBottom: '1rem', lineHeight: '1.5' }}>{prob.desc}</p>
-            
-            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
-              <button className="btn" onClick={() => toggleHint(prob.id)}>
-                {expandedHints[prob.id] ? 'Hide Hint' : '💡 Hint'}
+      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '1rem', paddingTop: '1.5rem' }}>
+        
+        {/* Category Tabs (Segmented Look) */}
+        <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '1.5rem', marginBottom: '1rem' }}>
+          {Object.keys(PROBS).map(tab => {
+            const isActive = activeTab === tab;
+            return (
+              <button 
+                key={tab} 
+                onClick={() => setActiveTab(tab)}
+                style={{
+                  padding: '0.6rem 1.25rem',
+                  background: isActive ? 'linear-gradient(135deg, var(--p), #7C3AED)' : 'rgba(255,255,255,0.03)',
+                  color: isActive ? '#fff' : 'var(--text-muted)',
+                  border: '1px solid',
+                  borderColor: isActive ? 'transparent' : 'var(--border)',
+                  borderRadius: '99px',
+                  cursor: 'pointer',
+                  fontWeight: '600',
+                  fontSize: '0.9rem',
+                  textTransform: 'capitalize',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.2s ease',
+                  boxShadow: isActive ? '0 4px 15px rgba(168, 85, 247, 0.3)' : 'none'
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) { e.currentTarget.style.color = '#fff'; e.currentTarget.style.background = 'rgba(255,255,255,0.08)'; }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) { e.currentTarget.style.color = 'var(--text-muted)'; e.currentTarget.style.background = 'rgba(255,255,255,0.03)'; }
+                }}
+              >
+                {tab.replace('-', ' ')}
               </button>
-              <button className="btn primary" onClick={() => toggleExplain(prob.id)}>
-                {expandedExplains[prob.id] ? 'Hide Explanation' : '📚 Explain'}
-              </button>
-              <button className="btn" onClick={() => toggleNotes(prob.id)} style={{ borderColor: 'var(--p)', color: 'var(--p)' }}>
-                {expandedNotes[prob.id] ? 'Hide Notes' : '📓 My Notes'}
-              </button>
-            </div>
+            )
+          })}
+        </div>
 
-            {expandedHints[prob.id] && (
-              <div style={{ background: 'rgba(255, 204, 0, 0.1)', padding: '1rem', borderRadius: '4px', borderLeft: '3px solid #ffcc00', marginBottom: '1rem' }}>
-                <strong>Hint:</strong> {prob.hint}
-              </div>
-            )}
+        {/* Problems List */}
+        <div style={{ maxWidth: '1000px' }}>
+          {PROBS[activeTab]?.map((prob) => {
+            const getDiffColor = (d) => {
+              if (d === 'Easy') return { color: '#4ade80', bg: 'rgba(74, 222, 128, 0.1)', border: 'rgba(74, 222, 128, 0.2)' };
+              if (d === 'Medium') return { color: '#facc15', bg: 'rgba(250, 204, 21, 0.1)', border: 'rgba(250, 204, 21, 0.2)' };
+              if (d === 'Hard') return { color: '#f87171', bg: 'rgba(248, 113, 113, 0.1)', border: 'rgba(248, 113, 113, 0.2)' };
+              return { color: 'var(--text)', bg: 'rgba(255,255,255,0.05)', border: 'var(--border)' };
+            };
+            const diffStyle = getDiffColor(prob.diff);
 
-            {expandedExplains[prob.id] && (
-              <div style={{ background: 'rgba(168, 85, 247, 0.1)', padding: '1rem', borderRadius: '4px', borderLeft: '3px solid var(--p)', marginBottom: '1rem' }}>
-                <strong>Explanation:</strong> {prob.explain}
-              </div>
-            )}
+            return (
+              <div key={prob.id} className="card" style={{ marginBottom: '1.5rem', padding: '1.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+                  <h3 style={{ margin: 0, fontSize: '1.3rem', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <span className="material-symbols-outlined" style={{ color: diffStyle.color }}>task_alt</span>
+                    {prob.name}
+                  </h3>
+                  <span style={{ 
+                    fontSize: '0.8rem', 
+                    padding: '0.3rem 0.8rem', 
+                    borderRadius: '99px', 
+                    background: diffStyle.bg, 
+                    color: diffStyle.color,
+                    border: `1px solid ${diffStyle.border}`,
+                    fontWeight: '600',
+                    letterSpacing: '1px',
+                    textTransform: 'uppercase'
+                  }}>
+                    {prob.diff}
+                  </span>
+                </div>
+                
+                <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', lineHeight: '1.6', fontSize: '1rem' }}>{prob.desc}</p>
+                
+                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                  <button onClick={() => toggleHint(prob.id)} style={{
+                    padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem',
+                    background: expandedHints[prob.id] ? 'rgba(255, 204, 0, 0.15)' : 'rgba(255,255,255,0.03)',
+                    color: expandedHints[prob.id] ? '#facc15' : 'var(--text-muted)',
+                    border: `1px solid ${expandedHints[prob.id] ? 'rgba(250, 204, 21, 0.3)' : 'var(--border)'}`,
+                    transition: 'all 0.2s'
+                  }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>lightbulb</span>
+                    {expandedHints[prob.id] ? 'Hide Hint' : 'View Hint'}
+                  </button>
+                  
+                  <button onClick={() => toggleExplain(prob.id)} style={{
+                    padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem',
+                    background: expandedExplains[prob.id] ? 'rgba(45, 212, 191, 0.15)' : 'rgba(255,255,255,0.03)',
+                    color: expandedExplains[prob.id] ? 'var(--teal)' : 'var(--text-muted)',
+                    border: `1px solid ${expandedExplains[prob.id] ? 'rgba(45, 212, 191, 0.3)' : 'var(--border)'}`,
+                    transition: 'all 0.2s'
+                  }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>menu_book</span>
+                    {expandedExplains[prob.id] ? 'Hide Explanation' : 'Explanation'}
+                  </button>
 
-            {expandedNotes[prob.id] && (
-              <div style={{ background: 'rgba(0, 0, 0, 0.2)', padding: '1rem', borderRadius: '4px', border: '1px solid var(--border)' }}>
-                <p style={{ fontSize: '0.9rem', color: 'var(--sub)', marginBottom: '0.5rem' }}>Personal Markdown Notes & Code Solutions:</p>
-                <textarea
-                  style={{ 
-                    width: '100%', 
-                    height: '150px', 
-                    background: 'var(--bg)', 
-                    color: 'var(--text)', 
-                    border: '1px solid var(--border)', 
-                    borderRadius: '4px', 
-                    padding: '0.75rem',
-                    fontFamily: 'monospace',
-                    marginBottom: '1rem',
-                    resize: 'vertical'
-                  }}
-                  value={localNotes[prob.id] !== undefined ? localNotes[prob.id] : (user?.notes?.[prob.id] || '')}
-                  onChange={(e) => handleNoteChange(prob.id, e.target.value)}
-                  placeholder="```python\ndef solution():\n  pass\n```\nI struggled with the edge case here..."
-                />
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <button className="btn primary" onClick={() => saveNote(prob.id)}>Save to Database</button>
+                  <button onClick={() => toggleNotes(prob.id)} style={{
+                    padding: '0.5rem 1rem', borderRadius: '6px', cursor: 'pointer', fontWeight: 500, fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem',
+                    background: expandedNotes[prob.id] ? 'rgba(168, 85, 247, 0.15)' : 'rgba(255,255,255,0.03)',
+                    color: expandedNotes[prob.id] ? 'var(--p)' : 'var(--text-muted)',
+                    border: `1px solid ${expandedNotes[prob.id] ? 'rgba(168, 85, 247, 0.3)' : 'var(--border)'}`,
+                    transition: 'all 0.2s'
+                  }}>
+                    <span className="material-symbols-outlined" style={{ fontSize: '18px' }}>edit_note</span>
+                    {expandedNotes[prob.id] ? 'Hide Notes' : 'My Notes / Code'}
+                  </button>
+                </div>
+
+                <div style={{ marginTop: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {expandedHints[prob.id] && (
+                    <div style={{ background: 'rgba(250, 204, 21, 0.05)', padding: '1.25rem', borderRadius: '8px', borderLeft: '4px solid #facc15', color: '#fef08a', animation: 'fadeIn 0.3s ease' }}>
+                      <strong style={{ display: 'block', marginBottom: '0.25rem', color: '#facc15' }}>Quick Hint:</strong> 
+                      {prob.hint}
+                    </div>
+                  )}
+
+                  {expandedExplains[prob.id] && (
+                    <div style={{ background: 'rgba(45, 212, 191, 0.05)', padding: '1.25rem', borderRadius: '8px', borderLeft: '4px solid var(--teal)', color: '#ccfbf1', animation: 'fadeIn 0.3s ease' }}>
+                      <strong style={{ display: 'block', marginBottom: '0.25rem', color: 'var(--teal)' }}>Approach & Explanation:</strong> 
+                      {prob.explain}
+                    </div>
+                  )}
+
+                  {expandedNotes[prob.id] && (
+                    <div style={{ background: 'rgba(0, 0, 0, 0.3)', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border)', animation: 'fadeIn 0.3s ease' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+                        <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Personal Notes & Solution Code:</p>
+                        <button className="btn primary" onClick={() => saveNote(prob.id)} style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}>Save to DB</button>
+                      </div>
+                      <textarea
+                        style={{ 
+                          width: '100%', 
+                          minHeight: '200px', 
+                          background: '#09090E', 
+                          color: '#e2e8f0', 
+                          border: '1px solid var(--border)', 
+                          borderRadius: '6px', 
+                          padding: '1rem',
+                          fontFamily: 'JetBrains Mono, monospace',
+                          fontSize: '0.9rem',
+                          resize: 'vertical',
+                          boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5)'
+                        }}
+                        value={localNotes[prob.id] !== undefined ? localNotes[prob.id] : (user?.notes?.[prob.id] || '')}
+                        onChange={(e) => handleNoteChange(prob.id, e.target.value)}
+                        placeholder="// Write your code or thoughts here...&#10;def solve(nums):&#10;    pass"
+                      />
+                    </div>
+                  )}
                 </div>
               </div>
-            )}
-          </div>
-        ))}
+            );
+          })}
 
-        {(!PROBS[activeTab] || PROBS[activeTab].length === 0) && (
-          <p style={{ color: 'var(--sub)' }}>Problems coming soon.</p>
-        )}
+          {(!PROBS[activeTab] || PROBS[activeTab].length === 0) && (
+            <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-faded)' }}>
+              <span className="material-symbols-outlined" style={{ fontSize: '4rem', marginBottom: '1rem', opacity: 0.5 }}>pending</span>
+              <h2>More Problems Coming Soon</h2>
+              <p>We are actively adding high-quality problems to this category.</p>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

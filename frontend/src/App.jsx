@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { ProgressProvider } from './context/ProgressContext';
 import './index.css';
 import Navbar from './components/Navbar';
@@ -12,11 +12,16 @@ import { ProgressContext } from './context/ProgressContext';
 
 const AppContent = () => {
   const { isAuthenticated } = React.useContext(ProgressContext);
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState(false);
+  const location = useLocation();
+
+  const isLandingPage = location.pathname === '/';
+  const showSidebar = isAuthenticated && !isLandingPage;
 
   return (
-    <div className={isAuthenticated ? "app-container" : ""}>
-      {isAuthenticated && <Navbar />}
-      <main className={isAuthenticated ? "main-content" : ""}>
+    <div className={`app-container ${showSidebar ? (isSidebarCollapsed ? 'sidebar-collapsed' : '') : ""}`}>
+      {showSidebar && <Navbar isCollapsed={isSidebarCollapsed} toggleSidebar={() => setIsSidebarCollapsed(!isSidebarCollapsed)} />}
+      <main className={showSidebar ? "main-content" : ""} style={!showSidebar ? { flex: 1, width: '100%', maxWidth: '100vw' } : {}}>
         <Routes>
           <Route path="/" element={<Landing />} />
           <Route path="/auth" element={<Auth />} />

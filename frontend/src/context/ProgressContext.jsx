@@ -1,4 +1,5 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { API_URL } from '../config';
 
 export const ProgressContext = createContext();
 
@@ -17,7 +18,7 @@ export const ProgressProvider = ({ children }) => {
 
   const fetchProgress = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/progress', {
+      const res = await fetch(`${API_URL}/api/progress`, {
         headers: {
           'x-auth-token': token
         }
@@ -52,7 +53,7 @@ export const ProgressProvider = ({ children }) => {
     }
 
     if (token) {
-      await fetch('http://localhost:5000/api/progress', {
+      await fetch(`${API_URL}/api/progress`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -67,9 +68,41 @@ export const ProgressProvider = ({ children }) => {
     }
   };
 
+  const toggleTopic = async (topicName) => {
+    let newTopics = [...completedTopics];
+    if (newTopics.includes(topicName)) {
+      newTopics = newTopics.filter(t => t !== topicName);
+    } else {
+      newTopics.push(topicName);
+    }
+    setCompletedTopics(newTopics);
+
+    // Also update activity log when making progress
+    const today = new Date().toISOString().split('T')[0];
+    let newActivityLog = user?.activityLog || [];
+    if (!newActivityLog.includes(today)) {
+      newActivityLog.push(today);
+    }
+
+    if (token) {
+      await fetch(`${API_URL}/api/progress`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token
+        },
+        body: JSON.stringify({ 
+          completedTopics: newTopics,
+          activityLog: newActivityLog
+        })
+      });
+      setUser(prev => ({ ...prev, activityLog: newActivityLog }));
+    }
+  };
+
   const updateUserField = async (fields) => {
     if (token) {
-      const res = await fetch('http://localhost:5000/api/progress', {
+      const res = await fetch(`${API_URL}/api/progress`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -107,6 +140,7 @@ export const ProgressProvider = ({ children }) => {
       completedWeeks,
       completedTopics,
       toggleWeek,
+      toggleTopic,
       updateUserField,
       login,
       logout,

@@ -1,5 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_URL } from '../config';
 import { ProgressContext } from '../context/ProgressContext';
 
 const InputField = ({ label, name, type = 'text', required = false, value, onChange }) => {
@@ -76,7 +77,7 @@ export const Auth = () => {
     const endpoint = isLogin ? '/api/auth/login' : '/api/auth/register';
     
     try {
-      const res = await fetch(`http://localhost:5000${endpoint}`, {
+      const res = await fetch(`${API_URL}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)

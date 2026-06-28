@@ -14,6 +14,7 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/progress', require('./routes/progress'));
 app.use('/api/leetcode', require('./routes/leetcode'));
+app.use('/api/ai', require('./routes/ai'));
 
 app.get('/', (req, res) => {
   res.send('MERN DSA API Running');
