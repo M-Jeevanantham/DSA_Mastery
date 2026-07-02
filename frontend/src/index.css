@@ -689,3 +689,14 @@ input:focus {
 .hover-glass:hover {
   background: rgba(255, 255, 255, 0.1) !important;
 }
+
+
+/* Hide scrollbars globally */
+::-webkit-scrollbar {
+  display: none;
+}
+
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
