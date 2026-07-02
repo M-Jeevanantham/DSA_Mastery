@@ -1,6 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { ProgressContext } from '../context/ProgressContext';
 import { WEEKS, PHASES } from '../data';
+import { motion } from 'framer-motion';
 
 export const Home = () => {
   const { user, completedWeeks, completedTopics, updateUserField, token } = useContext(ProgressContext);
@@ -105,7 +106,13 @@ export const Home = () => {
   }
 
   return (
-    <div className="page on" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+    <motion.div 
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4 }}
+      className="page on" 
+      style={{ display: 'flex', flexDirection: 'column', height: '100%' }}
+    >
 
       {/* Sticky Header */}
       <div style={{
@@ -319,6 +326,6 @@ export const Home = () => {
 
       </div>
 
-    </div>
+    </motion.div>
   );
 };

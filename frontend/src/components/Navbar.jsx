@@ -66,6 +66,10 @@ const Navbar = ({ isCollapsed, toggleSidebar }) => {
 
       <div className="nav-group">
         {!isCollapsed && <div className="nav-group-title">Test & Apply</div>}
+        <NavLink to="/leaderboard" className={({ isActive }) => `nb ${isActive ? 'on' : ''}`} title="Leaderboard">
+          <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>leaderboard</span>
+          {!isCollapsed && <span>Leaderboard</span>}
+        </NavLink>
         <NavLink to="/practice" className={({ isActive }) => `nb ${isActive ? 'on' : ''}`} title="Practice">
           <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>terminal</span>
           {!isCollapsed && <span>Practice</span>}

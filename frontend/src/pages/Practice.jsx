@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import Editor from '@monaco-editor/react';
 import { PROBS } from '../data/practice';
 import { ProgressContext } from '../context/ProgressContext';
 
@@ -188,24 +189,22 @@ export const Practice = () => {
                         <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--text-muted)', fontWeight: 600 }}>Personal Notes & Solution Code:</p>
                         <button className="btn primary" onClick={() => saveNote(prob.id)} style={{ padding: '0.4rem 1rem', fontSize: '0.85rem' }}>Save to DB</button>
                       </div>
-                      <textarea
-                        style={{ 
-                          width: '100%', 
-                          minHeight: '200px', 
-                          background: '#09090E', 
-                          color: '#e2e8f0', 
-                          border: '1px solid var(--border)', 
-                          borderRadius: '6px', 
-                          padding: '1rem',
-                          fontFamily: 'JetBrains Mono, monospace',
-                          fontSize: '0.9rem',
-                          resize: 'vertical',
-                          boxShadow: 'inset 0 2px 10px rgba(0,0,0,0.5)'
-                        }}
-                        value={localNotes[prob.id] !== undefined ? localNotes[prob.id] : (user?.notes?.[prob.id] || '')}
-                        onChange={(e) => handleNoteChange(prob.id, e.target.value)}
-                        placeholder="// Write your code or thoughts here...&#10;def solve(nums):&#10;    pass"
-                      />
+                      <div style={{ height: '300px', border: '1px solid var(--border)', borderRadius: '6px', overflow: 'hidden', background: '#09090E' }}>
+                        <Editor
+                          height="100%"
+                          defaultLanguage="python"
+                          theme="vs-dark"
+                          value={localNotes[prob.id] !== undefined ? localNotes[prob.id] : (user?.notes?.[prob.id] || '')}
+                          onChange={(value) => handleNoteChange(prob.id, value)}
+                          options={{
+                            minimap: { enabled: false },
+                            fontSize: 14,
+                            fontFamily: 'JetBrains Mono, monospace',
+                            scrollBeyondLastLine: false,
+                            padding: { top: 16 }
+                          }}
+                        />
+                      </div>
                     </div>
                   )}
                 </div>

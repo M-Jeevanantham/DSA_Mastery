@@ -10,3 +10,4 @@ export { Resources } from './Resources';
 export { Auth } from './Auth';
 export { Landing } from './Landing';
 export { Flashcards } from './Flashcards';
+export { Leaderboard } from './Leaderboard';

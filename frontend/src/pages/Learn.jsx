@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { PHASES } from '../data/index';
 import { getStaticContent } from '../data/staticLessons';
 import { ProgressContext } from '../context/ProgressContext';
@@ -181,7 +182,7 @@ export const Learn = () => {
         {activeTab === 'static' && (
           <div className="card" style={{ padding: '3rem' }}>
             <div className="markdown-body">
-              <ReactMarkdown>{currentStaticLesson.text}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{currentStaticLesson.text}</ReactMarkdown>
             </div>
             
             {currentStaticLesson.complexity && currentStaticLesson.complexity !== 'N/A' && (
@@ -260,7 +261,7 @@ export const Learn = () => {
                    </button>
                 </div>
                 <div className="markdown-body">
-                  <ReactMarkdown>{aiContent}</ReactMarkdown>
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiContent}</ReactMarkdown>
                 </div>
               </div>
             )}

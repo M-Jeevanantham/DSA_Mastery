@@ -20,8 +20,8 @@ export const Landing = () => {
         <h1 style={{ fontSize: 'clamp(2.5rem, 8vw, 5.5rem)', marginBottom: '1.5rem', background: 'linear-gradient(135deg, #fff 0%, #A855F7 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', lineHeight: 1.1, letterSpacing: '-2px' }}>
           Master DSA.<br/>Zero Guesswork.
         </h1>
-        <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', marginBottom: '3rem', maxWidth: '600px', lineHeight: '1.6' }}>
-          A premium, gamified platform designed to take you from a complete beginner to a Data Structures & Algorithms master in 4 structured weeks.
+        <p style={{ fontSize: '1.25rem', color: 'var(--text-muted)', margin: '0 auto 3rem auto', maxWidth: '600px', lineHeight: '1.6' }}>
+          A premium, gamified platform designed to take you from a complete beginner to a Data Structures & Algorithms master in 6 structured phases.
         </p>
         
         <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>

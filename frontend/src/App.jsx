@@ -5,7 +5,7 @@ import './index.css';
 import Navbar from './components/Navbar';
 // Pages
 import {
-  Landing, Home, Schedule, Phases, Learn, CheatSheet, Practice, Quiz, Tips, Resources, Auth, Flashcards
+  Landing, Home, Schedule, Phases, Learn, CheatSheet, Practice, Quiz, Tips, Resources, Auth, Flashcards, Leaderboard
 } from './pages';
 import ProtectedRoute from './components/ProtectedRoute';
 import { ProgressContext } from './context/ProgressContext';
@@ -35,6 +35,7 @@ const AppContent = () => {
           <Route path="/flashcards" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Flashcards /></ProtectedRoute>} />
           <Route path="/practice" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Practice /></ProtectedRoute>} />
           <Route path="/quiz" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Quiz /></ProtectedRoute>} />
+          <Route path="/leaderboard" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Leaderboard /></ProtectedRoute>} />
           <Route path="/tips" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Tips /></ProtectedRoute>} />
           <Route path="/resources" element={<ProtectedRoute isAuthenticated={isAuthenticated}><Resources /></ProtectedRoute>} />
         </Routes>

@@ -15,6 +15,31 @@ router.get('/', auth, async (req, res) => {
     res.status(500).send('Server Error');
   }
 });
+// @route   GET /api/progress/leaderboard
+// @desc    Get top users based on completed topics
+// @access  Private
+router.get('/leaderboard', auth, async (req, res) => {
+  try {
+    const topUsers = await User.aggregate([
+      {
+        $project: {
+          username: 1,
+          fullName: 1,
+          email: 1,
+          leetcodeUsername: 1,
+          completedTopicsCount: { $size: { $ifNull: ["$progress.completedTopics", []] } },
+          activityCount: { $size: { $ifNull: ["$activityLog", []] } }
+        }
+      },
+      { $sort: { completedTopicsCount: -1 } },
+      { $limit: 10 }
+    ]);
+    res.json(topUsers);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).send('Server Error');
+  }
+});
 
 // @route   PUT /api/progress
 // @desc    Update user progress (toggle week or add/remove topic)

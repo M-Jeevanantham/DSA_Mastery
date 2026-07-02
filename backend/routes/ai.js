@@ -1,38 +1,29 @@
 const express = require('express');
 const router = express.Router();
 const { GoogleGenerativeAI } = require('@google/generative-ai');
+const AILesson = require('../models/AILesson');
+const rateLimit = require('express-rate-limit');
 
-const fs = require('fs');
-const path = require('path');
-
-const CACHE_FILE = path.join(__dirname, '../lessonsCache.json');
-
-// Helper to read cache
-const readCache = () => {
-  if (fs.existsSync(CACHE_FILE)) {
-    try { return JSON.parse(fs.readFileSync(CACHE_FILE, 'utf-8')); } catch (e) { return {}; }
-  }
-  return {};
-};
-
-// Helper to write cache
-const writeCache = (data) => {
-  fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2));
-};
+// Rate Limiter: max 10 requests per 15 minutes per IP
+const aiLessonLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, 
+  max: 10,
+  message: { msg: 'Too many requests from this IP, please try again after 15 minutes.' }
+});
 
 // POST /api/ai/lesson
-router.post('/lesson', async (req, res) => {
+router.post('/lesson', aiLessonLimiter, async (req, res) => {
   try {
     const { topic } = req.body;
     if (!topic) {
       return res.status(400).json({ msg: 'Topic is required' });
     }
 
-    // Check Cache First
-    const cache = readCache();
-    if (cache[topic]) {
-      console.log(`Serving ${topic} from Cache!`);
-      return res.json({ text: cache[topic].text });
+    // Check Cache First in MongoDB
+    const cachedLesson = await AILesson.findOne({ topic });
+    if (cachedLesson) {
+      console.log(`Serving ${topic} from MongoDB Cache!`);
+      return res.json({ text: cachedLesson.content });
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -91,14 +82,17 @@ Generate the lesson using ALL of the following 32 sections in order. Use Markdow
     const text = response.text();
 
     // Save to Cache before returning
-    cache[topic] = { text };
-    writeCache(cache);
+    const newLesson = new AILesson({
+      topic,
+      content: text
+    });
+    await newLesson.save();
 
     res.json({ text });
   } catch (err) {
     console.error('AI Error:', err.message);
     if (err.status === 429 || (err.message && err.message.includes('429'))) {
-      return res.status(429).json({ msg: 'Rate limit exceeded. Please wait 1 minute.' });
+      return res.status(429).json({ msg: 'Rate limit exceeded by Gemini API. Please wait 1 minute.' });
     }
     res.status(500).json({ msg: 'Failed to generate AI content.' });
   }
