@@ -69,7 +69,18 @@ Generate the lesson using ALL of the following 32 sections in order. Use Markdow
 24. Interview Perspective
 25. Real World Applications
 26. Practice Problems
-27. Quiz
+27. Quiz (Must include at least one Multiple Choice, one True/False, and one Fill-in-the-blanks. Format them exactly as follows:
+For Multiple Choice / True-False:
+**Q1: [Question Text]**
+- A) [Option]
+- B) [Option]
+- C) [Option]
+- D) [Option]
+**Correct:** A
+
+For Fill-in-the-blanks (DO NOT provide options, just the correct answer):
+**Q2: The time complexity is O(_____).**
+**Correct:** 1)
 28. Cheatsheet
 29. Revision Notes
 30. Frequently Asked Questions

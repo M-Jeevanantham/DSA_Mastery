@@ -48,7 +48,7 @@ const parseQuizQuestions = (quizContent) => {
     if (!tline) continue;
     
     // Check for Question start (e.g. "**Q1:** What is..." or "1. What is...")
-    const qMatch = tline.match(/^(?:\*\*)?(?:Q\d+[:.]|\d+\.)(?:\*\*)?\s+(.*)/);
+    const qMatch = tline.match(/^(?:\*\*)?(?:Q\d+[:.]|\d+\.)(?:\*\*)?\s+(.*?)(?:\*\*)?$/);
     if (qMatch) {
       if (currentQuestion && currentQuestion.questionText) {
         questions.push(currentQuestion);
@@ -64,17 +64,17 @@ const parseQuizQuestions = (quizContent) => {
 
     if (!currentQuestion) continue;
 
-    // Check for Options (e.g. "- **A:** text" or "- A) text")
-    const optMatch = tline.match(/^-\s*(?:\*\*)?([A-D])(?:[:.)])?(?:\*\*)?\s+(.*)/i);
+    // Check for Options (e.g. "- **A:** text", "* A) text", or just "A) text")
+    const optMatch = tline.match(/^(?:[-*]\s*)?(?:\*\*)?([A-D])(?:[:.)])?(?:\*\*)?\s+(.*)/i);
     if (optMatch) {
       currentQuestion.options.push({ key: optMatch[1].toUpperCase(), text: optMatch[2] });
       continue;
     }
 
-    // Check for Correct Answer (e.g. "**Correct:** A")
-    const correctMatch = tline.match(/^(?:\*\*)?Correct:?(?:\*\*)?\s*([A-D])/i);
+    // Check for Correct Answer (e.g. "**Correct:** A" or "**Correct:** 1")
+    const correctMatch = tline.match(/^(?:\*\*)?Correct:?(?:\*\*)?\s*(.+)/i);
     if (correctMatch) {
-      currentQuestion.correctAnswer = correctMatch[1].toUpperCase();
+      currentQuestion.correctAnswer = correctMatch[1].trim();
       continue;
     }
   }
@@ -142,7 +142,9 @@ const InteractiveQuiz = ({ quizContent, topicName, onComplete, alreadyCompleted 
       {questions.map((q, i) => {
         const isAnswered = answers[i] !== undefined;
         const userAnswer = answers[i];
-        const isCorrect = userAnswer === q.correctAnswer;
+        const isCorrect = typeof userAnswer === 'string' && typeof q.correctAnswer === 'string' 
+          ? userAnswer.toLowerCase() === q.correctAnswer.toLowerCase() 
+          : userAnswer === q.correctAnswer;
         
         return (
           <div key={i} style={{ marginBottom: '2.5rem' }}>
@@ -159,42 +161,71 @@ const InteractiveQuiz = ({ quizContent, topicName, onComplete, alreadyCompleted 
             </div>
             
             <div style={{ marginLeft: '2.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              {q.options.map(opt => {
-                let bg = 'rgba(255,255,255,0.02)';
-                let border = '1px solid var(--border)';
-                let color = 'var(--text)';
-                if (isAnswered) {
-                  if (opt.key === q.correctAnswer) {
-                    bg = 'rgba(16,185,129,0.1)';
-                    border = '1px solid rgba(16,185,129,0.4)';
-                    color = '#10b981';
-                  } else if (opt.key === userAnswer) {
-                    bg = 'rgba(244,63,94,0.1)';
-                    border = '1px solid rgba(244,63,94,0.4)';
-                    color = '#F43F5E';
+              {q.options.length > 0 ? (
+                q.options.map(opt => {
+                  let bg = 'rgba(255,255,255,0.02)';
+                  let border = '1px solid var(--border)';
+                  let color = 'var(--text)';
+                  if (isAnswered) {
+                    if (opt.key === q.correctAnswer) {
+                      bg = 'rgba(16,185,129,0.1)';
+                      border = '1px solid rgba(16,185,129,0.4)';
+                      color = '#10b981';
+                    } else if (opt.key === userAnswer) {
+                      bg = 'rgba(244,63,94,0.1)';
+                      border = '1px solid rgba(244,63,94,0.4)';
+                      color = '#F43F5E';
+                    }
+                  } else if (userAnswer === opt.key) {
+                    bg = 'rgba(255,255,255,0.06)';
                   }
-                } else if (userAnswer === opt.key) {
-                  bg = 'rgba(255,255,255,0.06)';
-                }
-                
-                return (
-                  <button
-                    key={opt.key}
+                  
+                  return (
+                    <button
+                      key={opt.key}
+                      disabled={isAnswered}
+                      onClick={() => !isAnswered && handleAnswer(i, opt.key)}
+                      style={{
+                        display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1.25rem',
+                        borderRadius: '8px', background: bg, border, color, textAlign: 'left',
+                        cursor: isAnswered ? 'default' : 'pointer', transition: 'all 0.2s', width: '100%'
+                      }}
+                    >
+                      <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{opt.key}.</span>
+                      <span>{opt.text}</span>
+                      {isAnswered && opt.key === q.correctAnswer && <span className="material-symbols-outlined" style={{ marginLeft: 'auto' }}>task_alt</span>}
+                      {isAnswered && opt.key === userAnswer && opt.key !== q.correctAnswer && <span className="material-symbols-outlined" style={{ marginLeft: 'auto' }}>cancel</span>}
+                    </button>
+                  );
+                })
+              ) : (
+                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Type your answer here..."
                     disabled={isAnswered}
-                    onClick={() => !isAnswered && handleAnswer(i, opt.key)}
-                    style={{
-                      display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.85rem 1.25rem',
-                      borderRadius: '8px', background: bg, border, color, textAlign: 'left',
-                      cursor: isAnswered ? 'default' : 'pointer', transition: 'all 0.2s', width: '100%'
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' && !isAnswered && e.target.value.trim()) {
+                        handleAnswer(i, e.target.value.trim());
+                      }
                     }}
-                  >
-                    <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>{opt.key}.</span>
-                    <span>{opt.text}</span>
-                    {isAnswered && opt.key === q.correctAnswer && <span className="material-symbols-outlined" style={{ marginLeft: 'auto' }}>task_alt</span>}
-                    {isAnswered && opt.key === userAnswer && opt.key !== q.correctAnswer && <span className="material-symbols-outlined" style={{ marginLeft: 'auto' }}>cancel</span>}
-                  </button>
-                );
-              })}
+                    onBlur={(e) => {
+                      if (!isAnswered && e.target.value.trim()) {
+                        handleAnswer(i, e.target.value.trim());
+                      }
+                    }}
+                    style={{
+                      flex: 1, padding: '0.85rem 1.25rem', borderRadius: '8px',
+                      background: isAnswered ? (isCorrect ? 'rgba(16,185,129,0.05)' : 'rgba(244,63,94,0.05)') : 'rgba(255,255,255,0.03)',
+                      border: isAnswered ? (isCorrect ? '1px solid #10b981' : '1px solid #F43F5E') : '1px solid var(--border)',
+                      color: 'var(--text)', fontSize: '1rem', outline: 'none'
+                    }}
+                  />
+                  {!isAnswered && (
+                    <span style={{ fontSize: '0.85rem', color: 'var(--text-faded)' }}>Press Enter to submit</span>
+                  )}
+                </div>
+              )}
             </div>
             
             {isAnswered && (
@@ -213,7 +244,7 @@ const InteractiveQuiz = ({ quizContent, topicName, onComplete, alreadyCompleted 
                   </strong>
                   {!isCorrect && q.correctAnswer && (
                     <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                      — Correct: <strong style={{ color: '#10b981' }}>{q.correctAnswer}</strong>
+                      — Correct Answer: <strong style={{ color: '#10b981' }}>{q.correctAnswer}</strong>
                     </span>
                   )}
                 </div>

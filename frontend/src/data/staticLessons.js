@@ -339,8 +339,25 @@ Top companies like Google, Meta, and Amazon frequently ask interview questions w
 
 ## 27. Quiz
 1. What is the primary performance advantage of this concept?
+   - A) It guarantees O(1) time complexity universally.
+   - B) It optimizes processing by eliminating redundant steps or overhead.
+   - C) It bypasses CPU execution and runs directly in memory.
+   - D) It prevents any possible edge cases from occurring.
+**Correct:** B
+
 2. What happens to the efficiency in the absolute worst-case scenario?
+   - A) It is rigidly bounded by its Big O notation limits.
+   - B) It causes the system to automatically crash.
+   - C) It exponentially speeds up execution.
+   - D) The worst-case is entirely identical to the best-case.
+**Correct:** A
+
 3. How does the algorithm handle edge cases like empty inputs?
+   - A) It silently ignores them without consequence.
+   - B) It usually requires explicit guard clauses or base cases to prevent failures.
+   - C) It guarantees 100% safety automatically.
+   - D) Empty inputs are mathematically impossible in this context.
+**Correct:** B
 
 ## 28. Cheatsheet
 - **Key Concept:** Optimize state transitions and minimize redundancy.
