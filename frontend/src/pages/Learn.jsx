@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { useLocation } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { PHASES } from '../data/index';
@@ -291,12 +292,20 @@ const InteractiveQuiz = ({ quizContent, topicName, onComplete, alreadyCompleted 
 // MAIN: Learn Page (Paginated)
 // ════════════════════════════════════════════════════════════
 export const Learn = () => {
+  const location = useLocation();
   const [activePhaseNum, setActivePhaseNum] = useState(1);
-  const [activeTopic, setActiveTopic] = useState('Big O notation');
+  const [activeTopic, setActiveTopic] = useState(location.state?.topic || 'Big O notation');
   const [activeTab, setActiveTab] = useState('static'); // 'static' or 'ai'
   const { completedTopics, toggleTopic } = useContext(ProgressContext);
   const [showTopics, setShowTopics] = useState(false);
   
+  // Update topic if we navigate to /learn with a new topic in state
+  useEffect(() => {
+    if (location.state && location.state.topic) {
+      setActiveTopic(location.state.topic);
+    }
+  }, [location.state]);
+
   // Section state
   const [currentSectionIdx, setCurrentSectionIdx] = useState(0);
   const [quizCompleted, setQuizCompleted] = useState(false);

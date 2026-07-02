@@ -69,6 +69,7 @@ export const Phases = () => {
               >
                 <div 
                   onClick={() => togglePhase(phase.num)} 
+                  className="phase-card-header"
                   style={{ 
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer',
                     padding: '1.5rem 2rem',
@@ -84,7 +85,8 @@ export const Phases = () => {
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       fontSize: '1.5rem', fontWeight: 'bold', color: isExpanded ? '#fff' : 'var(--text-muted)',
                       boxShadow: isExpanded ? '0 4px 15px rgba(168, 85, 247, 0.4)' : 'none',
-                      transition: 'all 0.3s'
+                      transition: 'all 0.3s',
+                      flexShrink: 0
                     }}>
                       {phase.num}
                     </div>
@@ -95,11 +97,11 @@ export const Phases = () => {
                           <span title="Phase Mastered" style={{ fontSize: '1.2rem' }}>🏆</span>
                         )}
                       </h2>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                      <div className="phase-header-info" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                         <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', margin: 0 }}>{phase.sub}</p>
                         
                         {/* Progress Bar */}
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, maxWidth: '200px' }}>
+                        <div className="phase-progress-bar" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flex: 1, maxWidth: '200px' }}>
                           <div style={{ height: '6px', background: 'rgba(255,255,255,0.1)', borderRadius: '99px', flex: 1, overflow: 'hidden' }}>
                             <div style={{ 
                               height: '100%', 
@@ -107,7 +109,7 @@ export const Phases = () => {
                               background: completedInPhase === totalTopicsInPhase ? '#10b981' : 'var(--p)'
                             }}></div>
                           </div>
-                          <span style={{ fontSize: '0.8rem', color: 'var(--text-faded)' }}>{completedInPhase}/{totalTopicsInPhase}</span>
+                          <span style={{ fontSize: '0.8rem', color: 'var(--text-faded)', whiteSpace: 'nowrap' }}>{completedInPhase}/{totalTopicsInPhase}</span>
                         </div>
                       </div>
                     </div>
@@ -116,7 +118,8 @@ export const Phases = () => {
                     width: '32px', height: '32px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text)',
                     transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                    transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                    flexShrink: 0
                   }}>
                     <span className="material-symbols-outlined">expand_more</span>
                   </div>
@@ -128,7 +131,7 @@ export const Phases = () => {
                   transition: 'max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.5s ease',
                   opacity: isExpanded ? 1 : 0
                 }}>
-                  <div style={{ padding: '2rem' }}>
+                  <div className="phase-card-body" style={{ padding: '2rem' }}>
                     {phase.secs.map((sec, i) => (
                       <div key={i} style={{ marginBottom: '1.5rem' }}>
                         <h4 style={{ 
@@ -146,9 +149,9 @@ export const Phases = () => {
                               key={idx} 
                               onClick={(e) => {
                                 e.stopPropagation();
-                                toggleTopic(chip);
+                                navigate('/learn', { state: { topic: chip } });
                               }}
-                              title={isCompleted ? "Mark as incomplete" : "Mark as complete"}
+                              title={isCompleted ? "Completed" : "Start Learning"}
                               style={{ 
                                 cursor: 'pointer',
                                 background: isCompleted ? 'rgba(16, 185, 129, 0.1)' : 'rgba(255,255,255,0.03)', 
